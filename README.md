@@ -1,4 +1,3 @@
-# Datacom
 
   # Lab Works:
     1) Simple error detection (odd/even) parity checker.
