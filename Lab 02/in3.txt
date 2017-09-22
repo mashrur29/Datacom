@@ -1,0 +1,7 @@
+Checkbox is a system testing
+platform in ubuntu.
+It aims to provide a common
+framework to run all
+types of tests, from hardware tests,
+to command line tests, unit tests
+or desktop tests.
