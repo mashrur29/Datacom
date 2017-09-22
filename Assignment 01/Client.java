@@ -1,55 +1,58 @@
 package datacom;
 
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.Socket;
+import java.util.Random;
+import java.util.Scanner;
 
-/**
- *
- * @author zero639
- */
-public class Server {
 
-    public static void main(String args[]) throws IOException {
-        ServerSocket sc = new ServerSocket(2234);
-        Socket s = sc.accept();
+public class Client {
+
+    public static void main(String[] args) throws IOException {
+        Socket s = new Socket("localhost", 1234);
         DataOutputStream os = new DataOutputStream(s.getOutputStream());
         DataInputStream is = new DataInputStream(s.getInputStream());
-        FileWriter fout = new FileWriter("out.txt");
-        int mod = 0;
-        String str = "";
-        
-        while (true) {
-            int x = is.readInt();
-            if (x == -1) {
-                mod %= 16;
-                int ans = is.readInt();
-                if (mod == ans) {
-                    System.out.println("OK");
-                    fout.append(str);
-                    fout.append(System.getProperty("line.separator"));
-                    str = "";
-                    os.writeUTF("recieved");
-                } else {
-                    os.writeUTF("error");
-                    str = "";
-                    System.out.println("error");
+        FileReader fin = new FileReader("in.txt");
+        Scanner sc = new Scanner(fin);
+        Random r = new Random();
+        while (sc.hasNext()) {
+            String str = sc.nextLine();
+            int c[] = new int[str.length()];
+            int x = 0;
+            for (int i = 0; i < str.length(); i++) {
+                c[i] = str.charAt(i);
+                x += str.charAt(i);
+            }
+
+            while (true) {
+                int y = r.nextInt();
+                y%=100;
+                if (y < 30) {
+                    x++;
                 }
-                mod = 0;
-            } else if (x == -2) {
-                break;
-            } else {
-                mod += x;
-                str = str + (char) x;
+                x %= 16;
+                for (int i = 0; i < c.length; i++) {
+                    os.writeInt(c[i]);
+                }
+                os.writeInt(-1);
+                os.writeInt(x);
+
+                String sig = is.readUTF();
+                if (sig.equals("recieved")) {
+                    break;
+                } else {
+                    System.err.println("error");
+                }
             }
 
         }
-
-        fout.close();
+        os.writeInt(-2);
         is.close();
         os.close();
         s.close();
-
     }
 }
-
